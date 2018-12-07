@@ -1,0 +1,32 @@
+---
+title: "code"
+author: "Amy"
+date: "12/6/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library, message=FALSE}
+library(readr)
+library(tidyverse)
+```
+
+```{r upload data}
+train <- read_csv("train.csv")
+test <- read_csv("test.csv")
+```
+
+```{r remove outliers in "GrLivArea"}
+#check outliers
+ggplot(aes(x=GrLivArea, y=SalePrice), data = train) + geom_point()
+#outlier removal
+train <- train %>% filter(GrLivArea <= 4500)
+```
+
+```{r check features of SalePrice}
+ggplot(aes(SalePrice),data = train) + geom_density()
+```
+
