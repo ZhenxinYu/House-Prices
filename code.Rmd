@@ -14,7 +14,7 @@ library(readr)
 library(tidyverse)
 ```
 
-```{r upload data}
+```{r upload data, message=FALSE}
 train <- read_csv("train.csv")
 test <- read_csv("test.csv")
 ```
@@ -26,7 +26,21 @@ ggplot(aes(x=GrLivArea, y=SalePrice), data = train) + geom_point()
 train <- train %>% filter(GrLivArea <= 4500)
 ```
 
-```{r check features of SalePrice}
-ggplot(aes(SalePrice),data = train) + geom_density()
+```{r check features of SalePrice, message=FALSE}
+#distribution of SalePrice is skewed
+ggplot(aes(SalePrice),data = train) + 
+  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_density(alpha=.2, fill="#FF6666")
+
+#log the SalePrice
+train[,'SalePrice_log'] <- log(train[,'SalePrice'])
+ggplot(aes(SalePrice_log),data = train) + 
+  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_density(alpha=.2, fill="#FF6666")
+```
+
+```{r check missing values}
+colSums(is.na(train))[colSums(is.na(train)) > 0]
+#colSums(is.na(test))[colSums(is.na(test)) > 0]
 ```
 
