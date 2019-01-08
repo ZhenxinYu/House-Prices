@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r library, message=FALSE}
 library(readr)
 library(tidyverse)
+library(mice)
 ```
 
 ```{r upload data, message=FALSE}
@@ -32,7 +33,7 @@ ggplot(aes(SalePrice),data = train) +
   geom_histogram(aes(y=..density..), colour="black", fill="white") +
   geom_density(alpha=.2, fill="#FF6666")
 
-#log the SalePrice
+#log the SalePrice and add to the train csv
 train[,'SalePrice_log'] <- log(train[,'SalePrice'])
 ggplot(aes(SalePrice_log),data = train) + 
   geom_histogram(aes(y=..density..), colour="black", fill="white") +
@@ -41,6 +42,42 @@ ggplot(aes(SalePrice_log),data = train) +
 
 ```{r check missing values}
 colSums(is.na(train))[colSums(is.na(train)) > 0]
-#colSums(is.na(test))[colSums(is.na(test)) > 0]
+colSums(is.na(test))[colSums(is.na(test)) > 0]
+
+sort(sapply(train, function(x){sum(is.na(x))}), decreasing = TRUE)
+sort(sapply(test, function(x){sum(is.na(x))}), decreasing = TRUE)
 ```
+
+```{r check variables}
+#change variable types
+train$MSSubClass <- as.factor(train$MSSubClass)
+train$YrSold <- as.factor(train$YrSold)
+train$MoSold <- as.factor(train$MoSold)
+
+test$MSSubClass <- as.factor(test$MSSubClass)
+test$YrSold <- as.factor(test$YrSold)
+test$MoSold <- as.factor(test$MoSold)
+```
+
+```{r select columns that should be imputed}
+include <- c('FireplaceQu', 'LotFrontage', 'GarageYrBlt', 'GarageFinish', 'GarageQual', 'GarageCond', 'GarageType', 'BsmtCond', 'BsmtQual', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2', 'MasVnrType', 'MasVnrArea', 'MSZoning', 'Utilities', 'BsmtFullBath', 'BsmtHalfBath', 'Functional', 'Exterior1st', 'Exterior2nd', 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', 'KitchenQual', 'GarageCars', 'GarageArea', 'SaleType')
+
+impute <- train[include]
+```
+
+```{r impute missing values}
+imp.train <- mice(impute, m=1, method = 'cart', printFlag = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
